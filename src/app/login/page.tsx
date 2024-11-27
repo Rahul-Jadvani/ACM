@@ -29,7 +29,7 @@ const Login = () => {
       mutationFn: async (data: any) => await loginUser(data),
       onSuccess: (data: any) => {
         toast.success(data.message);
-        router.push('/');
+        router.push('/'); // Default redirect
       },
       onError: (error: any) => {
         toast.error(error?.response?.data?.message || error?.message);
@@ -43,8 +43,9 @@ const Login = () => {
   const toggleEmailLogin = () => {
     setShowEmailLogin((prev) => !prev);
   };
+
   const handleSubmit = (
-    event: FormEvent<HTMLFormElement>,
+    event: FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
     loginType: string
   ) => {
     event.preventDefault();
@@ -57,6 +58,9 @@ const Login = () => {
         break;
       case 'email':
         loginUserMutate({ email, password });
+        break;
+      case 'marketplace':
+        signIn('credentials', { redirectTo: '/authpage' }); // Marketplace login
         break;
       default:
         console.error('Unknown login type');
@@ -73,36 +77,47 @@ const Login = () => {
           onSubmit={(e) => handleSubmit(e, showEmailLogin ? 'email' : 'social')}
           className="space-y-4 p-0 sm:p-5"
         >
+          {/* Google Login */}
           <button
             type="button"
-            onClick={() => handleSubmit(new Event('submit') as any, 'google')}
-            className="w-full py-2 text-xl font-semibold bg-white text-black rounded-xl flex items-center justify-center"
+            onClick={(e) => handleSubmit(e, 'google')}
+            className="w-full py-2 text-xl font-semibold bg-white text-black rounded-xl flex items-center justify-center mb-6"
           >
             Login with Google <FcGoogle className="ml-2 w-7 h-7" />
           </button>
 
-          <div className="space-y-2">
-            {/* Login with Discord */}
-            <Link href="https://discord.com/oauth2/authorize?client_id=1221868348015644804&response_type=code&redirect_uri=https%3A%2F%2Fwww.captainside.com%2Fapi%2Fdiscord%2Fredirect&scope=identify+email">
-              <button
-                type="button"
-                className="w-full py-2 text-xl font-semibold bg-[#5865F2] text-white rounded-xl flex items-center justify-center"
-              >
-                Login with Discord <FaDiscord className="ml-2 w-7 h-7" />
-              </button>
-            </Link>
-          </div>
-
-          <div className="space-y-4">
-            <p className="text-center text-xl">or</p>
+          {/* Discord Login */}
+          <Link href="https://discord.com/oauth2/authorize?client_id=1221868348015644804&response_type=code&redirect_uri=https%3A%2F%2Fwww.captainside.com%2Fapi%2Fdiscord%2Fredirect&scope=identify+email">
             <button
               type="button"
-              className="w-full py-2 text-xl font-semibold bg-[#350949] text-white rounded-xl flex items-center justify-center"
-              onClick={toggleEmailLogin}
+              className="w-full py-2 text-xl font-semibold bg-[#5865F2] text-white rounded-xl flex items-center justify-center"
             >
-              Login with Email
+              Login with Discord <FaDiscord className="ml-2 w-7 h-7" />
             </button>
+          </Link>
+
+          {/* Separator */}
+          <div className="space-y-4">
+            <p className="text-center text-xl">or</p>
           </div>
+
+          {/* Marketplace Login */}
+          <button
+            type="button"
+            onClick={(e) => handleSubmit(e, 'marketplace')}
+            className="w-full py-2 text-xl font-semibold bg-[#9B006F] text-white rounded-xl flex items-center justify-center"
+          >
+            Login for Marketplace
+          </button>
+
+          {/* Email Login */}
+          <button
+            type="button"
+            className="w-full py-2 text-xl font-semibold bg-[#350949] text-white rounded-xl flex items-center justify-center"
+            onClick={toggleEmailLogin}
+          >
+            Login with Email
+          </button>
 
           {showEmailLogin && (
             <div className="space-y-4 mt-4">
@@ -137,6 +152,7 @@ const Login = () => {
             </div>
           )}
 
+          {/* Submit Button */}
           <div className="flex flex-col gap-4 justify-center">
             <button
               type="submit"

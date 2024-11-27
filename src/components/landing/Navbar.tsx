@@ -21,6 +21,13 @@ export default function Navbar({ bgColor = '#110219' }: NavbarProps) {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const navItems = [
+    { name: 'Events', path: '/events' },
+    { name: 'Game Pass', path: '/gamePass' },
+    { name: 'Marketplace', path: '/marketplace' },
+    { name: 'About Us', path: '/aboutus' },
+  ];
+
   useEffect(() => {
     async function fetchSession() {
       const sessionData = await getSession();
@@ -31,11 +38,6 @@ export default function Navbar({ bgColor = '#110219' }: NavbarProps) {
   }, []);
 
   const user = (session?.user as CustomUser) || null;
-
-  async function getSessionData() {
-    const sessionData = await getSession();
-  }
-  getSessionData();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -65,48 +67,29 @@ export default function Navbar({ bgColor = '#110219' }: NavbarProps) {
             </Link>
           </div>
           <div className="hidden ml-5 md:flex md:items-center md:space-x-4">
-            <Link
-              href="/events"
-              className={`text-md ${
-                activeLink === 'events'
-                  ? 'text-fuchsia-600'
-                  : 'hover:text-fuchsia-600'
-              }`}
-              onClick={() => handleLinkClick('events')}
-            >
-              Events
-            </Link>
-            <Link
-              href="gamePass"
-              className={`text-md ${
-                activeLink === 'gamePass'
-                  ? 'text-fuchsia-600'
-                  : 'hover:text-fuchsia-600'
-              }`}
-              onClick={() => handleLinkClick('gamePass')}
-            >
-              Game Pass
-            </Link>
-            <Link
-              href="/aboutus"
-              className={`text-md ${
-                activeLink === 'aboutUs'
-                  ? 'text-fuchsia-600'
-                  : 'hover:text-fuchsia-600'
-              }`}
-              onClick={() => handleLinkClick('aboutUs')}
-            >
-              About Us
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.path}
+                className={`text-md ${
+                  activeLink === item.name
+                    ? 'text-fuchsia-600'
+                    : 'hover:text-fuchsia-600'
+                }`}
+                onClick={() => handleLinkClick(item.name)}
+              >
+                {item.name}
+              </Link>
+            ))}
             {session && (
               <Link
                 href={`/user/${encodeURI(session.user.name)}`}
                 className={`text-md ${
-                  activeLink === 'aboutUs'
+                  activeLink === 'My Account'
                     ? 'text-fuchsia-600'
                     : 'hover:text-fuchsia-600'
                 }`}
-                onClick={() => handleLinkClick('user/${userid}')}
+                onClick={() => handleLinkClick('My Account')}
               >
                 My Account
               </Link>
@@ -142,8 +125,8 @@ export default function Navbar({ bgColor = '#110219' }: NavbarProps) {
                   <Link
                     href="/login"
                     prefetch={false}
-                    className=" relative text-white px-3.5 py-0.5 text-base font-semibold overflow-hidden"
-                    onClick={() => handleLinkClick('login')}
+                    className="relative text-white px-3.5 py-0.5 text-base font-semibold overflow-hidden"
+                    onClick={() => handleLinkClick('Login')}
                   >
                     <div className="pentagon bg-[#d600e1] absolute inset-0"></div>
                     <span className="relative text-black z-10 text-center">
@@ -171,49 +154,35 @@ export default function Navbar({ bgColor = '#110219' }: NavbarProps) {
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              href="/events"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                activeLink === 'events' ? 'bg-gray-700' : 'hover:bg-gray-700'
-              }`}
-              onClick={() => handleLinkClick('events')}
-            >
-              Events
-            </Link>
-            <Link
-              href="/gamePass"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                activeLink === 'gamePass' ? 'bg-gray-700' : 'hover:bg-gray-700'
-              }`}
-              onClick={() => handleLinkClick('gamePass')}
-            >
-              Game Pass
-            </Link>
-            <Link
-              href="/aboutus"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                activeLink === 'aboutUs' ? 'bg-gray-700' : 'hover:bg-gray-700'
-              }`}
-              onClick={() => handleLinkClick('aboutUs')}
-            >
-              About Us
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.path}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  activeLink === item.name ? 'bg-gray-700' : 'hover:bg-gray-700'
+                }`}
+                onClick={() => handleLinkClick(item.name)}
+              >
+                {item.name}
+              </Link>
+            ))}
             {session && (
               <Link
                 href={`/user/${encodeURI(session.user.name)}`}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  activeLink === 'aboutUs' ? 'bg-gray-700' : 'hover:bg-gray-700'
+                  activeLink === 'My Account'
+                    ? 'bg-gray-700'
+                    : 'hover:bg-gray-700'
                 }`}
-                onClick={() => handleLinkClick('user/${userid}')}
+                onClick={() => handleLinkClick('My Account')}
               >
                 My Account
               </Link>
             )}
-
             {session ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-2">
                 <Notification />
-                <div className="flex items-center px-3 py-2">
+                <div className="flex items-center">
                   <Image
                     src={session.user?.image || User}
                     alt="User Avatar"
@@ -222,9 +191,7 @@ export default function Navbar({ bgColor = '#110219' }: NavbarProps) {
                     className="rounded-full mr-2"
                   />
                   <button
-                    onClick={() => {
-                      signOut();
-                    }}
+                    onClick={() => signOut()}
                     className="px-3 py-2 rounded-md text-base font-medium"
                   >
                     Logout
@@ -235,9 +202,9 @@ export default function Navbar({ bgColor = '#110219' }: NavbarProps) {
               <Link
                 href="/login"
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  activeLink === 'login' ? 'bg-gray-700' : 'hover:bg-gray-700'
+                  activeLink === 'Login' ? 'bg-gray-700' : 'hover:bg-gray-700'
                 }`}
-                onClick={() => handleLinkClick('login')}
+                onClick={() => handleLinkClick('Login')}
               >
                 Login
               </Link>
